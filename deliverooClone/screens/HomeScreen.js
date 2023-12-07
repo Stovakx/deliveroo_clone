@@ -8,11 +8,12 @@ import { featured } from "../constants";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView className="bg-white">
+    <SafeAreaView className="bg-white ">
       <SearchBar />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom:30 }}
+        className="mb-12"
       >
         <Categories />
         <View className="mt-5">

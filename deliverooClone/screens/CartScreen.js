@@ -1,13 +1,33 @@
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { themeColors } from "../themes";
 import * as Icon from "react-native-feather";
-import { featured } from "../constants";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { selectRestaurant } from "../utils/slices/restaurantSlice";
+import { removeFromCart, selectCartItems, selectCarttTotal } from "../utils/slices/cartSlice";
 
 export default function CartScreen() {
-  const restaurant = featured.restaurants[0];
+  const restaurant = useSelector(selectRestaurant);
   const navigation = useNavigation();
+  const cartItems = useSelector(selectCartItems);
+  const cartTotal = useSelector(selectCarttTotal);
+  const deliveryFee = 2;
+  const [groupedItems, setGroupedItems] = useState({});
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    const items = cartItems.reduce((group, item)=>{
+      if(group[item.id]){
+        group[item.id].push(item);
+      }else{
+        group[item.id] = [item];
+      }
+      return group
+    }, {});
+    setGroupedItems(items);
+  },[cartItems]);
+
   return (
     <View className="bg-white flex-1">
       <View className="relative py-4 shadow-sm">
@@ -41,14 +61,16 @@ export default function CartScreen() {
         contentContainerStyle={{ paddingBottom: 50 }}
         className="bg-white pt-5"
       >
-        {restaurant.dishes.map((dish, index) => {
+        {
+          Object.entries(groupedItems).map((items, key) => {
+            let dish = items[0];
           return (
             <View
               className="flex-row items-center space-x-3 py-2 px-4 bg-white rounded-3xl mx-2 mb-3 shadow-md"
-              key={index}
+              key={key}
             >
               <Text className="font-bold" style={{ color: themeColors.text }}>
-                {dish.name} - 2 x
+                {dish.name} {dish.length} x
               </Text>
               <Image className="h-14 w-14 rounded-full" source={dish.image} />
               <Text className="flex-1 font-bold text-gray-700">
@@ -56,6 +78,7 @@ export default function CartScreen() {
               </Text>
               <Text className="font-semibold text-base">${dish.price}</Text>
               <TouchableOpacity
+                onPress={()=> dispatch(removeFromCart({id: dish.id})) }
                 className="p-1 rounded-full"
                 style={{ backgroundColor: themeColors.bgColor(1) }}
               >
@@ -76,15 +99,15 @@ export default function CartScreen() {
       >
         <View className="felx-row justify-between">
           <Text className="text-gray-700">Subtotal</Text>
-          <Text className="text-gray-700">$20</Text>
+          <Text className="text-gray-700">${cartTotal}</Text>
         </View>
         <View className="felx-row justify-between">
           <Text className="text-gray-700">Delivery Fee</Text>
-          <Text className="text-gray-700">$2</Text>
+          <Text className="text-gray-700">${deliveryFee}</Text>
         </View>
         <View className="felx-row justify-between">
           <Text className="text-gray-700 font-extrabold">Order Total</Text>
-          <Text className="text-gray-700 font-extrabold">$22</Text>
+          <Text className="text-gray-700 font-extrabold">${cartTotal+deliveryFee}</Text>
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate("OrderPreparing")}
