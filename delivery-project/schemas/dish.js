@@ -15,7 +15,7 @@ export default defineType({
       name: "description",
       type: 'string',
       title: 'Dish Description',
-      validation: rule=> rule.required()
+      validation: rule=> rule.required(200)
     },
     {
       name: "image",

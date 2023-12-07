@@ -1,11 +1,13 @@
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { themeColors } from "../themes";
 import * as Icon from "react-native-feather";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRestaurant } from "../utils/slices/restaurantSlice";
 import { removeFromCart, selectCartItems, selectCarttTotal } from "../utils/slices/cartSlice";
+import { urlFor } from "../sanity/index";
+
 
 export default function CartScreen() {
   const restaurant = useSelector(selectRestaurant);
@@ -16,7 +18,7 @@ export default function CartScreen() {
   const [groupedItems, setGroupedItems] = useState({});
   const dispatch = useDispatch();
 
-  useEffect(()=>{
+  useMemo(()=>{
     const items = cartItems.reduce((group, item)=>{
       if(group[item.id]){
         group[item.id].push(item);
@@ -55,30 +57,29 @@ export default function CartScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-      {/* dishes can do component disher and use in reastaurantCard and here?  */}
+      {/* dishes can do component dish and use in reastaurantCard and here?  */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
         className="bg-white pt-5"
       >
         {
-          Object.entries(groupedItems).map((items, key) => {
-            let dish = items[0];
+          Object.entries(groupedItems).map(([items, key]) => {
           return (
             <View
               className="flex-row items-center space-x-3 py-2 px-4 bg-white rounded-3xl mx-2 mb-3 shadow-md"
               key={key}
             >
               <Text className="font-bold" style={{ color: themeColors.text }}>
-                {dish.name} {dish.length} x
+                {items.name} {items.length} x
               </Text>
-              <Image className="h-14 w-14 rounded-full" source={dish.image} />
+              <Image className="h-14 w-14 rounded-full" source={{uri: urlFor(items[0]?.image).url()}} />
               <Text className="flex-1 font-bold text-gray-700">
-                {dish.name}
+                {items.name}
               </Text>
-              <Text className="font-semibold text-base">${dish.price}</Text>
+              <Text className="font-semibold text-base">${items.price}</Text>
               <TouchableOpacity
-                onPress={()=> dispatch(removeFromCart({id: dish.id})) }
+                onPress={()=> dispatch(removeFromCart({id: items[0]?.id})) }
                 className="p-1 rounded-full"
                 style={{ backgroundColor: themeColors.bgColor(1) }}
               >

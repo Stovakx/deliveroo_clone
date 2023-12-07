@@ -1,42 +1,38 @@
-import client from "./api";
+import sanityClient from './sanity';
+let sanityQuery = (query, params)=> sanityClient.fetch(query, params);
 
-export const getFeaturedRestaurants = async () => {
-  const getFeaturedRestaurants = await client.fetch(`
-  *[_type=="featured"]{  
-    ...,
-    restaurants[]->{
-      ...,
-        dishes[]->{
-          ...,
-          
-        },
-      type->{
-      name
-      
-      }
-    }
-  }
-  `);
-  return getFeaturedRestaurants;
-};
+export const getFeaturedResturants = ()=>{
+    return sanityQuery(`
+        *[_type == 'featured'] {
+            ...,
+            resturants[]->{
+            ...,
+            type->{
+                name
+            },
+            dishes[]->
+            }
+        }
+    `);
+}
 
-export const getCategories = async () => {
-  const categories = await client.fetch(`*[_type=="category"]`);
-  return categories;
-};
+export const getCategories = ()=>{
+    return sanityQuery(`
+        *[_type == 'category']
+    `);
+}
 
-export const getFeaturedRestaurantById = async (id) => {
-  const getFeaturedRestaurantById = client.fetch(
-    `*[_type=="feature" && _id == $id ]{
-      ...,
-      restaurants[] ->{
-          ...,
-          dishes[]->{
-              name
-          }
-      }
-  }`,
-{ id }
-  )
-  return getFeaturedRestaurantById;
-};
+export const getFeaturedResturantById = id=>{
+    return sanityQuery(`
+        *[_type == 'featured' && _id == $id] {
+            ...,
+            resturants[]->{
+                ...,
+                dishes[]->,
+                type->{
+                    name
+                }
+            }
+        }[0]
+    `, {id})
+}

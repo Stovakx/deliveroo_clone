@@ -8,11 +8,11 @@ import { getFeaturedRestaurants } from "../sanity/api";
 
 
 export default function HomeScreen() {
-  const [FeaturedRestaurants, setGetFeaturedRestaurants] = useState([]);
+  const [featuredCategories, setFeaturedCategories] = useState([]);
 
   useEffect(()=>{
     getFeaturedRestaurants().then(data=>{
-      setGetFeaturedRestaurants(data);
+      setFeaturedCategories(data);
     })
   },[])
   return (
@@ -26,13 +26,15 @@ export default function HomeScreen() {
         <Categories />
         <View className="mt-5">
           {
-            FeaturedRestaurants.map((item, index) => {
+            featuredCategories.map(category => {
             return (
               <FeaturedRow
-                key={index}
-                title={item.name}
-                restaurants={item.restaurants}
-                description={item.description}
+                key={category._id}
+                id={category._id}
+                title={category.name}
+                restaurants={category.restaurants}
+                description={category.description}
+                featuredCategory={category._type}
               />
             );
           })}

@@ -1,10 +1,12 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getCategories } from "../sanity/api";
+import { urlFor } from '../sanity/index';
 
 export default function Categories() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [categories, setCategories] = useState([]);
+
   useEffect(()=>{
     getCategories().then(data=>{
       setCategories(data);
@@ -31,11 +33,11 @@ export default function Categories() {
             <View key={index} className="flex justify-center items-center mr-6">
               <TouchableOpacity
                 className={`p-1 rounded-full shadow bg-gray-200 ${btnClass}`}
-                onPress={() => setActiveCategory(category.id)}
+                onPress={() => setActiveCategory(category._id)}
               >
                 <Image
                   style={{ width: 45, height: 45 }}
-                  source={{uri: urlFor(category.image)}}
+                  source={{uri: urlFor(category.image.url())}}
                   
                 />
               </TouchableOpacity>
